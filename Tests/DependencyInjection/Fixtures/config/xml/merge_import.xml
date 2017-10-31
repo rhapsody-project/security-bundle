@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:rhapsody="http://symfony.com/schema/dic/rhapsody/security"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd
+                        http://symfony.com/schema/dic/rhapsody/security http://symfony.com/schema/dic/rhapsody/security/rhapsody-security-1.0.xsd">
+
+    <rhapsody:config>
+
+        <rhapsody:jwt enabled="true" public-key-path="/path/to/jwt/public.key" private-key-path="/path/to/jwt/private.key" pass-phrase="notsecret" token-ttl="3600">
+
+            <rhapsody:payload adapter="rhapsody_security.jwt.adapter.payload_adapter.default" identity-claim="identity">
+                <rhapsody:claim id="identity" name="username" property="username" required="true" />
+                <rhapsody:claim id="roles" name="roles" required="true" />
+            </rhapsody:payload>
+
+            <rhapsody:encoder service="rhapsody_security.jwt.encoder.default" signature-algorithm="RS256" crypto-engine="openssl" />
+
+        </rhapsody:jwt>
+
+    </rhapsody:config>
+
+</container>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mongo-mapping xmlns="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
+                        http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd">
+
+    <mapped-superclass name="Rhapsody\SecurityBundle\Model\RefreshToken" collection="rhapsody_security_refresh_tokens">
+
+        <field name="username" fieldName="username" type="string" />
+        
+        <field name="token" fieldName="token" type="string" />
+
+        <field name="tokenExpired" fieldName="tokenExpired" type="boolean" />
+    
+        <field name="tokenExpiresAt" fieldName="tokenExpiresAt" type="date" />
+
+        <indexes>
+            <index>
+                <key name="username" order="asc" />
+                <option name="safe" value="true" />
+                <option name="unique" value="true" />
+            </index>
+            <index>
+                <key name="token" order="asc" />
+                <option name="safe" value="true" />
+                <option name="sparse" value="true" />
+                <option name="unique" value="true" />
+            </index>
+        </indexes>
+
+    </mapped-superclass>
+
+</doctrine-mongo-mapping>

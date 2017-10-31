@@ -1,0 +1,15 @@
+rhapsody_security:
+    db_driver: custom
+
+    jwt:
+        enabled:                 true
+        public_key_path:         ~
+        private_key_path:        ~
+        pass_phrase:             ~
+        token_ttl:               ~
+
+        payload:                 ~
+
+        encoder:                 ~
+
+        token_extractors:        ~

@@ -1,0 +1,34 @@
+security:
+    providers:
+        default:
+            id: foo
+
+    firewalls:
+        default:
+            jwt_login: true
+        custom_checkpath:
+            jwt_login:
+                check_path: /my/check_path
+        custom_credentials:
+            jwt_login:
+                username_path: foo
+                password_path: bar
+        full:
+            jwt_login:
+                login_path: /my/login_path
+                check_path: /my/check_path
+                username_path: foo
+                password_path: bar
+                use_forward: false
+                require_previous_session: false
+                provider: default
+                remember_me: true
+                success_handler: my.authentication.success_handler
+                failure_handler: my.authentication.failure_handler
+                failure_path: /auth/failure
+                failure_path_parameter: _auth_failure
+                failure_forward: false
+                always_use_default_target_path: true
+                default_target_path: /home
+                target_path_parameter: _target
+                use_referer: true

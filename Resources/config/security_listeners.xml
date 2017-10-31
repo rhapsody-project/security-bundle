@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+    
+        <service id="rhapsody_security.authentication.listener.jwt"
+          class="Rhapsody\SecurityBundle\Security\Http\Firewall\UsernamePasswordJwtAuthenticationListener"
+          parent="security.authentication.listener.abstract"
+          abstract="true" />
+          
+        <service id="rhapsody_security.authentication.provider.jwt" class="Rhapsody\SecurityBundle\Security\Jwt\Authentication\Provider\JwtAuthenticationProvider" abstract="true" public="false">
+            <argument /><!-- User Provider -->
+            <argument /><!-- User Checker -->
+            <argument /><!-- Provider Key -->
+            <argument type="service" id="rhapsody_security.jwt_manager" />
+        </service>
+
+    </services>
+</container>

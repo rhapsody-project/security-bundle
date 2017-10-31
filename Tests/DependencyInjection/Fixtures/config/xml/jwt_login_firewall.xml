@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<srv:container xmlns="http://symfony.com/schema/dic/security"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:srv="http://symfony.com/schema/dic/services"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <config>
+        <provider name="default" id="foo" />
+
+        <firewall name="default">
+            <jwt-login />
+        </firewall>
+        
+        <firewall name="custom_checkpath">
+            <jwt-login check-path="/my/check_path" />
+        </firewall>
+        
+        <firewall name="custom_credentials">
+            <jwt-login
+                username-path="foo"
+                password-path="bar"
+            />
+        </firewall>
+        
+        <firewall name="full">
+            <jwt-login
+                login-path="/my/login_path"
+                check-path="/my/check_path"
+                username-path="foo"
+                password-path="bar"
+                use-forward="false"
+                require-previous-session="false"
+                provider="default"
+                remember-me="true"
+                success-handler="my.authentication.success_handler"
+                failure-handler="my.authentication.failure_handler"
+                failure-path="/my/failure_path"
+                failure-path-parameter="_my_failure_path_parameter"
+                failure-forward="false"
+                always-use-default-target-path="true"
+                default-target-path="/my/default_target_path"
+                target-path-parameter="_target_path_parameter"
+                use-referer="true"
+            />
+        </firewall>
+    </config>
+</srv:container>

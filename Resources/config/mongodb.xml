@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <!-- Parameters -->
+    <parameters>
+        <parameter key="rhapsody_security.doctrine.odm.provider.document_user_provider.class">Rhapsody\SecurityBundle\Doctrine\ODM\MongoDB\DocumentUserProvider</parameter>
+    </parameters>
+    
+    <!-- Services -->
+    <services>
+
+        <service id="rhapsody_security.doctrine.document_manager" class="Doctrine\ODM\MongoDB\DocumentManager" public="false">
+          <factory service="doctrine_mongodb" method="getManager" />
+        </service>
+
+        <service id="rhapsody_security.doctrine.odm.provider.document_user_provider" class="%rhapsody_security.doctrine.odm.provider.document_user_provider.class%" public="false" abstract="true">
+            <argument type="service" id="rhapsody_security.doctrine.document_manager" />
+        </service>
+
+    </services>
+
+</container>

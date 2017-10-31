@@ -1,0 +1,19 @@
+rhapsody_security:
+    jwt:
+        enabled:                 true
+        public_key_path:         "/path/to/jwt/public.key"
+        private_key_path:        "/path/to/jwt/private.key"
+        pass_phrase:             notsecret
+        token_ttl:               3600
+
+        payload:
+            adapter:             rhapsody_security.jwt.adapter.payload_adapter.default
+            identity_claim:      identity
+            claims:
+                identity: { name: "user", property: "username", required: true }
+                roles:    { name: "roles", required: true }
+
+        encoder:
+            service:              rhapsody_security.jwt.encoder.default
+            signature_algorithm:  RS256
+            crypto_engine:        openssl

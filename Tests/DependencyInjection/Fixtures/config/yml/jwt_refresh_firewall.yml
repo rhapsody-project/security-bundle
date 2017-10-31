@@ -1,0 +1,16 @@
+security:
+    providers:
+        default:
+            id: foo
+
+    firewalls:
+        default:
+            jwt_login: true
+            jwt_refresh: true
+        custom_path:
+            jwt_login: true
+            jwt_refresh:
+                path: /my/path
+        full:
+            jwt_login: true
+            jwt_refresh: true

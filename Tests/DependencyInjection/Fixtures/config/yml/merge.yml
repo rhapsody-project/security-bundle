@@ -1,0 +1,24 @@
+imports:
+    - { resource: merge_import.yml }
+
+rhapsody_security:
+    db_driver: custom
+    
+    jwt:
+        enabled:                 true
+        public_key_path:         "/alt/location/of/jwt/public.key"
+        private_key_path:        "/alt/location/of/jwt/private.key"
+        pass_phrase:             secret
+        token_ttl:               86400
+
+        payload:
+            claims:
+                identity: { name: "foo", property: "bar", required: true }
+                email:    { name: "email" }
+                subject:  { name: "sub", property: "id" }
+      
+        encoder:
+            service:              rhapsody_security.jwt.encoder.lcobucci
+            signature_algorithm:  RS256
+            crypto_engine:        phpseclib
+        

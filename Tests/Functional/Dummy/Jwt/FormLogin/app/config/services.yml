@@ -1,0 +1,8 @@
+services:
+    logger: { class: Psr\Log\NullLogger }
+
+    rhapsody_security.test.jwt_event_subscriber:
+        class: Rhapsody\SecurityBundle\Tests\Functional\Utils\CallableEventSubscriber
+        shared: true
+        tags:
+            - { name: kernel.event_subscriber }

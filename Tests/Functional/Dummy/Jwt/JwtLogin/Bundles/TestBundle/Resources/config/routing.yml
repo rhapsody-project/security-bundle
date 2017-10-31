@@ -1,0 +1,29 @@
+jwt_login:
+    path:     /login
+    defaults: { _controller: "TestBundle:Login:login" }
+    
+jwt_login_auth_login_check:
+    path:     /auth/login_check
+    defaults: { _controller: "TestBundle:Login:loginCheck" }
+    methods:  [POST]
+
+jwt_login_auth_refresh:
+    path:     /auth/refresh
+    defaults: { _controller: "TestBundle:Login:refresh" }
+    methods:  [POST]
+
+jwt_login_homepage:
+    path:     /
+    defaults: { _controller: "TestBundle:Login:homepage" }
+
+jwt_login_custom_target_path:
+    path:     /foo
+    defaults: { _controller: "TestBundle:Login:afterLogin" }
+
+jwt_login_default_target_path:
+    path:     /dashboard
+    defaults: { _controller: "TestBundle:Login:afterLogin" }
+
+jwt_login_profile:
+    path:     /profile
+    defaults: { _controller: "TestBundle:Login:profile" }

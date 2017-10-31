@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="rhapsody_security.http.firewall.refresh_token_listener.class">Rhapsody\SecurityBundle\Security\Http\Firewall\RefreshTokenListener</parameter>
+        <parameter key="rhapsody_security.http.rememberme.chain_remember_me_services.class">Rhapsody\SecurityBundle\Security\Http\RememberMe\ChainRememberMeServices</parameter>
+        <parameter key="rhapsody_security.jwt.rememberme.persistent_jwt_remember_me_services.class">Rhapsody\SecurityBundle\Security\Jwt\RememberMe\PersistentJwtRememberMeServices</parameter>
+        <parameter key="rhapsody_security.jwt.rememberme.simple_jwt_remember_me_services.class">Rhapsody\SecurityBundle\Security\Jwt\RememberMe\SimpleJwtRememberMeServices</parameter>
+    </parameters>
+
+    <services>
+        <service id="rhapsody_security.authentication.listener.jwt_refresh" class="%rhapsody_security.http.firewall.refresh_token_listener.class%" abstract="true" public="false">
+            <tag name="monolog.logger" channel="security" />
+            <argument /> <!-- Remember me Services -->
+            <argument type="service" id="security.authentication.manager" />
+            <argument type="service" id="security.http_utils" />
+            <argument />
+            <argument type="service" id="security.authentication.success_handler" />
+            <argument type="service" id="security.authentication.failure_handler" />
+            <argument type="collection" />
+            <argument type="service" id="logger" on-invalid="null" />
+            <argument type="service" id="event_dispatcher" on-invalid="null" />
+        </service>
+
+        <service id="rhapsody_security.jwt.authentication.rememberme.services.abstract" abstract="true" public="false">
+            <tag name="monolog.logger" channel="security" />
+            <argument /> <!-- User Provider -->
+            <argument type="service" id="rhapsody_security.jwt_token_extractor" />
+            <argument type="service" id="rhapsody_security.jwt_manager" />
+            <argument /> <!-- Shared Provider Key -->
+            <argument type="collection" />
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="rhapsody_security.authentication.rememberme.services.chain" class="%rhapsody_security.http.rememberme.chain_remember_me_services.class%" public="false">
+            <argument type="collection" />
+        </service>
+
+        <!-- TODO: Not yet implemented.
+        <service id="rhapsody_security.jwt.authentication.rememberme.services.persistent"
+          class="%rhapsody_security.jwt.rememberme.persistent_remember_me_services.class%"
+          parent="rhapsody_security.jwt.authentication.rememberme.services.abstract"
+          abstract="true" />
+        -->
+
+        <service id="rhapsody_security.jwt.authentication.rememberme.services.simple_jwt"
+          class="%rhapsody_security.jwt.rememberme.simple_jwt_remember_me_services.class%"
+          parent="rhapsody_security.jwt.authentication.rememberme.services.abstract"
+          abstract="true" />
+
+        <!--
+        REFERENCE!
+        <service id="security.authentication.rememberme.services.abstract" abstract="true" public="false">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="collection" /> User Providers
+            <argument /> Shared Token Key
+            <argument /> Shared Provider Key
+            <argument type="collection" /> Options
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="security.authentication.rememberme.services.persistent"
+          class="Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices"
+          parent="security.authentication.rememberme.services.abstract"
+          abstract="true" />
+
+        <service id="security.authentication.rememberme.services.simplehash"
+          class="Symfony\Component\Security\Http\RememberMe\TokenBasedRememberMeServices"
+          parent="security.authentication.rememberme.services.abstract"
+          abstract="true" />
+        -->
+
+    </services>
+
+</container>

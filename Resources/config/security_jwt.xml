@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="rhapsody_security.http.authentication.jwt_authentication_failure_handler.class">Rhapsody\SecurityBundle\Security\Http\Authentication\JwtAuthenticationFailureHandler</parameter>
+        <parameter key="rhapsody_security.http.authentication.jwt_authentication_success_handler.class">Rhapsody\SecurityBundle\Security\Http\Authentication\JwtAuthenticationSuccessHandler</parameter>
+        <parameter key="rhapsody_security.guard.authenticator.jwt_token_authenticator.class">Rhapsody\SecurityBundle\Security\Guard\Authenticator\JwtTokenAuthenticator</parameter>
+        <parameter key="rhapsody_security.jwt.adapter.default_payload_adapter.class">Rhapsody\SecurityBundle\Security\Jwt\Adapter\DefaultPayloadAdapter</parameter>
+        <parameter key="rhapsody_security.jwt.adapter.lcobucci_payload_adapter.class">Rhapsody\SecurityBundle\Security\Jwt\Adapter\LcobucciPayloadAdapter</parameter>
+        <parameter key="rhapsody_security.jwt.authentication.provider.default_jws_provider.class">Rhapsody\SecurityBundle\Security\Jwt\Authentication\Provider\DefaultJwsProvider</parameter>
+        <parameter key="rhapsody_security.jwt.authentication.provider.jwt_authentication_provider.class">Rhapsody\SecurityBundle\Security\Jwt\Authentication\Provider\JwtAuthenticationProvider</parameter>
+        <parameter key="rhapsody_security.jwt.authentication.provider.lcobucci_jws_provider.class">Rhapsody\SecurityBundle\Security\Jwt\Authentication\Provider\LcobucciJwsProvider</parameter>
+        <parameter key="rhapsody_security.jwt.encoder.default_encoder.class">Rhapsody\SecurityBundle\Security\Jwt\Encoder\DefaultEncoder</parameter>
+        <parameter key="rhapsody_security.jwt.encoder.lcobucci_encoder.class">Rhapsody\SecurityBundle\Security\Jwt\Encoder\LcobucciEncoder</parameter>
+        <parameter key="rhapsody_security.jwt.key_loader.oppenssl_key_loader.class">Rhapsody\SecurityBundle\Security\Jwt\KeyLoader\OpenSSLKeyLoader</parameter>
+        <parameter key="rhapsody_security.jwt.key_loader.raw_key_loader.class">Rhapsody\SecurityBundle\Security\Jwt\KeyLoader\RawKeyLoader</parameter>
+        <parameter key="rhapsody_security.jwt.json_web_token_manager.class">Rhapsody\SecurityBundle\Security\Jwt\JsonWebTokenManager</parameter>
+        <parameter key="rhapsody_security.jwt.token_extractor.authorization_header_token_extractor.class">Rhapsody\SecurityBundle\Security\Jwt\TokenExtractor\AuthorizationHeaderTokenExtractor</parameter>
+        <parameter key="rhapsody_security.jwt.token_extractor.chain_token_extractor.class">Rhapsody\SecurityBundle\Security\Jwt\TokenExtractor\ChainTokenExtractor</parameter>
+        <parameter key="rhapsody_security.jwt.token_extractor.cookie_token_extractor.class">Rhapsody\SecurityBundle\Security\Jwt\TokenExtractor\CookieTokenExtractor</parameter>
+        <parameter key="rhapsody_security.jwt.token_extractor.json_body_token_extractor.class">Rhapsody\SecurityBundle\Security\Jwt\TokenExtractor\JsonBodyTokenExtractor</parameter>
+        <parameter key="rhapsody_security.jwt.token_extractor.query_parameter_token_extractor.class">Rhapsody\SecurityBundle\Security\Jwt\TokenExtractor\QueryParameterTokenExtractor</parameter>
+    </parameters>
+
+    <services>
+        <service id="rhapsody_security.authentication.jwt_authentication_failure_handler" class="%rhapsody_security.http.authentication.jwt_authentication_failure_handler.class%">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="rhapsody_security.authentication.jwt_authentication_success_handler" class="%rhapsody_security.http.authentication.jwt_authentication_success_handler.class%">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="rhapsody_security.jwt_manager"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="rhapsody_security.guard.authenticator.jwt_token_authenticator" class="%rhapsody_security.guard.authenticator.jwt_token_authenticator.class%">
+            <tag name="monolog.logger" channel="security" />
+            <argument type="service" id="rhapsody_security.jwt_manager"/>
+            <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="rhapsody_security.jwt.token_extractor.chain_token_extractor"/>
+        </service>
+
+        <service id="rhapsody_security.jwt_manager" class="%rhapsody_security.jwt.json_web_token_manager.class%">
+            <argument type="service" id="rhapsody_security.jwt_encoder" />
+            <argument type="service" id="rhapsody_security.jwt_payload_adapter" />
+            <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <!-- Alias to the JWT Token Authenticator -->
+        <service id="rhapsody_security.jwt_token_authenticator" parent="rhapsody_security.guard.authenticator.jwt_token_authenticator" />
+
+        <!--
+         # Payload Adapter (abstract)
+         # ==========================
+         #
+         # The abstract payload adapter provides a contract that all payload
+         # adapters are expected to adopt. This makes it possible to extend the
+         # payload adapters relatively easily.
+         -->
+        <service id="rhapsody_security.jwt.adapter.payload_adapter.abstract" abstract="true" public="false">
+            <argument type="service" id="logger" on-invalid="null" />
+        </service>
+
+        <service id="rhapsody_security.jwt.adapter.payload_adapter.default"
+            class="%rhapsody_security.jwt.adapter.default_payload_adapter.class%"
+            parent="rhapsody_security.jwt.adapter.payload_adapter.abstract">
+        </service>
+
+        <service id="rhapsody_security.jwt.adapter.payload_adapter.lcobucci"
+            class="%rhapsody_security.jwt.adapter.lcobucci_payload_adapter.class%"
+            parent="rhapsody_security.jwt.adapter.payload_adapter.abstract">
+        </service>
+
+        <!--
+         # JSON Web Signature Provider(s)
+         # ==============================
+         #
+         # All of the JSON Web Signature (JWS) providers in this file are
+         # defined as extensions of the abstract JWS provider definition. The
+         # dependency injection process for this bundle should replace the
+         # first argument of the constructor's parameters with the appropriate
+         # key loader service.
+         -->
+        <service id="rhapsody_security.jwt.authentication.provider.jws_provider.abstract" abstract="true" public="false">
+            <tag name="monolog.logger" channel="security" />
+            <argument></argument> <!-- keyloader service ref -->
+            <argument>%rhapsody_security.jwt.encoder.crypto_engine%</argument>
+            <argument>%rhapsody_security.jwt.encoder.signature_algorithm%</argument>
+            <argument>%rhapsody_security.jwt.token_ttl%</argument>
+        </service>
+
+        <!-- Namshi/JOSE-based -->
+        <service id="rhapsody_security.jwt.authentication.provider.jws_provider.default"
+          class="%rhapsody_security.jwt.authentication.provider.default_jws_provider.class%"
+          parent="rhapsody_security.jwt.authentication.provider.jws_provider.abstract">
+            <argument index="0" type="service" id="rhapsody_security.jwt_key_loader" />
+        </service>
+
+        <!-- Lcobucci-based -->
+        <service id="rhapsody_security.jwt.authentication.provider.jws_provider.lcobucci"
+          class="%rhapsody_security.jwt.authentication.provider.lcobucci_jws_provider.class%"
+          parent="rhapsody_security.jwt.authentication.provider.jws_provider.abstract">
+            <argument index="0" type="service" id="rhapsody_security.jwt_key_loader" />
+        </service>
+
+        <service id="rhapsody_security.jwt.claim" class="Rhapsody\SecurityBundle\Security\Jwt\Claim" abstract="true" public="false" />
+
+        <!--
+         # Encoder(s)
+         # ==========
+         #
+         -->
+        <service id="rhapsody_security.jwt.encoder.abstract" abstract="true" public="false">
+            <tag name="monolog.logger" channel="security" />
+            <argument></argument> <!-- jws provider ref -->
+        </service>
+
+        <service id="rhapsody_security.jwt.encoder.default"
+          class="%rhapsody_security.jwt.encoder.default_encoder.class%"
+          parent="rhapsody_security.jwt.encoder.abstract">
+            <argument index="0" type="service" id="rhapsody_security.jwt.authentication.provider.jws_provider.default" />
+        </service>
+
+        <service id="rhapsody_security.jwt.encoder.lcobucci"
+          class="%rhapsody_security.jwt.encoder.lcobucci_encoder.class%"
+          parent="rhapsody_security.jwt.encoder.abstract">
+            <argument index="0" type="service" id="rhapsody_security.jwt.authentication.provider.jws_provider.lcobucci" />
+        </service>
+
+        <!--
+         # Key Loader(s)
+         # =============
+         -->
+        <service id="rhapsody_security.jwt.key_loader.abstract"  abstract="true" public="false">
+            <argument>%rhapsody_security.jwt.private_key_path%</argument>
+            <argument>%rhapsody_security.jwt.public_key_path%</argument>
+            <argument>%rhapsody_security.jwt.pass_phrase%</argument>
+        </service>
+
+        <service id="rhapsody_security.jwt.key_loader.openssl"
+          class="%rhapsody_security.jwt.key_loader.oppenssl_key_loader.class%"
+          parent="rhapsody_security.jwt.key_loader.abstract" />
+
+        <service id="rhapsody_security.jwt.key_loader.raw"
+          class="%rhapsody_security.jwt.key_loader.raw_key_loader.class%"
+          parent="rhapsody_security.jwt.key_loader.abstract" />
+
+        <!--
+         # Token Extractor(s)
+         #
+         -->
+        <service id="rhapsody_security.jwt_token_extractor" alias="rhapsody_security.jwt.token_extractor.chain_token_extractor" />
+
+        <service id="rhapsody_security.jwt.token_extractor.chain_token_extractor" class="%rhapsody_security.jwt.token_extractor.chain_token_extractor.class%" public="false">
+            <argument type="collection" />
+        </service>
+
+        <service id="rhapsody_security.jwt.token_extractor.authorization_header_token_extractor" class="%rhapsody_security.jwt.token_extractor.authorization_header_token_extractor.class%">
+            <argument /> <!-- Header Value Prefix -->
+            <argument /> <!-- Header Value Name -->
+        </service>
+
+        <service id="rhapsody_security.jwt.token_extractor.json_body_token_extractor" class="%rhapsody_security.jwt.token_extractor.json_body_token_extractor.class%">
+            <argument /> <!-- Property Name -->
+        </service>
+
+        <service id="rhapsody_security.jwt.token_extractor.query_parameter_token_extractor" class="%rhapsody_security.jwt.token_extractor.query_parameter_token_extractor.class%">
+            <argument /> <!-- Parameter Name -->
+        </service>
+
+        <service id="rhapsody_security.jwt.token_extractor.cookie_token_extractor" class="%rhapsody_security.jwt.token_extractor.cookie_token_extractor.class%">
+            <argument /> <!-- Name -->
+        </service>
+    </services>
+
+</container>

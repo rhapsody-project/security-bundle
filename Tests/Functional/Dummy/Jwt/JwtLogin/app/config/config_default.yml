@@ -1,0 +1,60 @@
+imports:
+    - { resource: framework.yml }
+    - { resource: security.yml }
+    - { resource: services.yml }
+    - { resource: twig.yml }
+
+rhapsody_security:
+    db_driver: orm
+    jwt:
+        enabled: true
+        private_key_path:   "%kernel.root_dir%/../../../../../Fixtures/data/private.pem"
+        public_key_path:    "%kernel.root_dir%/../../../../../Fixtures/data/public.pem"
+        pass_phrase:        "to boldly go..."
+        
+        payload:
+            identity_claim: identity
+            claims:
+                identity: { name: "username", property: "username", required: true }
+                roles: { name: "roles" }
+
+        encoder:
+            service: rhapsody_security.jwt.encoder.default
+
+        token_extractors:
+            authorization_header:
+                enabled: true
+            cookie:
+               enabled: true
+            json_body:
+                enabled: true
+            query_parameter:
+                enabled: true
+
+security:
+    firewalls:
+        rhapsody_security_tests_function_jwt_jwtlogin_login:
+            pattern:  ^/login
+            stateless: true
+            anonymous: true
+
+        rhapsody_security_tests_function_jwt_jwtlogin_authentication:
+            pattern:  ^/auth/login_check
+            stateless: true
+            anonymous: true
+            provider: in_memory
+            jwt_login:
+                check_path: /auth/login_check
+                require_previous_session: false
+                success_handler: rhapsody_security.authentication.jwt_authentication_success_handler
+                failure_handler: rhapsody_security.authentication.jwt_authentication_failure_handler
+
+        rhapsody_security_tests_function_jwt_jwtlogin_main:
+            pattern:  ^/
+            stateless: true
+            anonymous: false
+            provider:  in_memory
+            guard:
+                authenticators:
+                    - rhapsody_security.jwt_token_authenticator
+        

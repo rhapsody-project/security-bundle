@@ -1,0 +1,44 @@
+rhapsody_security:
+    
+    jwt:
+        enabled:                 true
+        public_key_path:         null
+        private_key_path:        null
+        pass_phrase:             null
+        token_ttl:               3600
+        
+        payload:
+            #: The adapter that the JSON Web Token Manager will use when
+            #: constructing (or deconstructing) JWT payloads.
+            adapter:             rhapsody_security.jwt.adapter.payload_adapter.default
+            
+            #: The ID of the claim that services as the identity claim.
+            identity_claim:      identity
+            
+            #: A collection of claim definitions that should be added to the
+            #: JSON payload. Configurable per installation, however a claim
+            #: representing the user's "identity" is required. 
+            claims:
+                identity: { name: "username", property: "username", required: true }
+                roles: { name: "roles", property: "roles" }
+                email: { name: "email" }
+
+        encoder:
+            service:             rhapsody_security.jwt.encoder.default
+            signature_algorithm: RS256
+            crypto_engine:       openssl|phpseclib
+
+        token_extractors:
+
+            authorization_header:
+                enabled:         true
+                prefix:          Bearer
+                name:            Authorization
+
+            cookie:
+                enabled:         false
+                name:            BEARER
+
+            query_parameter:
+                enabled:         false
+                name:            bearer
